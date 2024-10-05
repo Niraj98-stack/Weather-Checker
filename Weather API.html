@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+ <html lang="en"> <head> 
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Weather API</title> 
+  <style>
+   body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f0f0f0; }
+   .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .landing-page, .weather-page { background-color: #4a0e4e; color: white; padding: 20px; border-radius: 10px; text-align: center; 
+    } .landing-page h1,
+     .weather-page h1 { margin-bottom: 20px; } 
+     button { background-color: white; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+     
+     .weather-page { display: none; }
+      .map-container { margin-top: 20px; height: 300px; background-color: #ccc; } .weather-data { display: flex; flex-wrap: wrap; justify-content: space-between; margin-top: 20px; }
+       .weather-item { background-color: #380a3d; color: white; padding: 10px; margin: 5px; border-radius: 5px; flex-basis: calc(33% - 10px); } </style>
+        </head> 
+        <body> 
+            <div class="container"> 
+            <div class="landing-page"> <h1>Weather API</h1> <button id="fetchData">Fetch Data</button>
+            </div> <div class="weather-page">
+                <h1>Welcome To The Weather App</h1>
+                 <p>Here is your current location:</p>
+                  <p id="coordinates"></p>
+                  <div class="map-container" id="map"></div> 
+                  <h2>Your Weather Data</h2> 
+                  <div class="weather-data" id="weatherData"></div> 
+                  </div> </div> 
+                  <script> const fetchDataBtn = document.getElementById('fetchData');
+                   const landingPage = document.querySelector('.landing-page'); const weatherPage = document.querySelector('.weather-page'); const coordinatesEl = document.getElementById('coordinates'); const weatherDataEl = document.getElementById('weatherData'); fetchDataBtn.addEventListener('click', () =>
+                    { if (navigator.geolocation)
+                   { navigator.geolocation.getCurrentPosition(successCallback, errorCallback); }
+                    else { alert("Geolocation is not supported by this browser."); }
+                 }); 
+                  function successCallback(position) 
+                  { const latitude = position.coords.latitude; 
+                    const longitude = position.coords.longitude; coordinatesEl.textContent = `Lat: ${latitude.toFixed(6)} Long: ${longitude.toFixed(6)}`; // Show weather page and hide 
+                    landingPage.style.display = 'none'; 
+                    weatherPage.style.display = 'block'; 
+                    // Load Google Maps 
+                    loadGoogleMaps(latitude, longitude); 
+                    // Fetch weather data 
+                    fetchWeatherData(latitude, longitude); } function errorCallback(error) { alert(`Error: ${error.message}
+                        `); 
+
+                    }
+                     function loadGoogleMaps(lat, lng) { 
+                        const mapDiv = document.getElementById('map'); 
+                        const mapUrl = 'https://www.google.com/maps/place/Pune,+Maharashtra/@18.5245986,73.7805654,12z/data=!3m1!4b1!4m6!3m5!1s0x3bc2bf2e67461101:0x828d43bf9d9ee343!8m2!3d18.5204303!4d73.8567437!16zL20vMDE1eTJx?entry=ttu&g_ep=EgoyMDI0MTAwMi4xIKXMDSoASAFQAw%3D%3D';
+                        mapDiv.innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}"></iframe>`; } 
+                        function fetchWeatherData(lat, lng) { // Replace 'YOUR_API_KEY' with your actual OpenWeatherMap API key 
+                        const apiKey = 'YOUR_API_KEY';
+                         const apiUrl = `(https://openweathermap.org/api/one-call-3/onecall?lat=${lat}&lon=${lng}&exclude=minutely,hourly,daily,alerts&appid=${apiKey}&units=metric`; fetch(apiUrl) 
+                         .then(response => response.json()) 
+                         .then(data => { displayWeatherData(data); }) 
+                         .catch(error => { console.error('Error fetching weather data:', error);
+                          alert('Failed to fetch weather data. Please try again.'); 
+                          }); 
+                          } function displayWeatherData(data) { const weatherItems = [ { label: 'Location', value: 'New Delhi' },
+                           { label: 'Wind Speed', value: `${data.current.wind_speed} km/h` }, 
+                           { label: 'Humidity', value: `${data.current.humidity}%` }, 
+                           { label: 'Time Zone', value: data.timezone },
+                            { label: 'Pressure', value: `${data.current.pressure} hPa` },
+                             { label: 'Wind Direction', value: getWindDirection(data.current.wind_deg)
+
+                              }, 
+                             { label: 'UV Index', value: data.current.uvi },
+                              { label: 'Feels Like', value: `${data.current.feels_like}°C` } ]; weatherDataEl.innerHTML = weatherItems.map(item => `
+                               <div class="weather-item"> 
+                                <strong>
+                                ${item.label}:
+                                </strong> 
+                              ${item.value}
+                               </div> 
+                               `) .join('');
+                               } 
+                               function getWindDirection(degrees) { 
+                                const directions = ['North', 'North East', 'East', 'South East', 'South', 'South West', 'West', 'North West']; 
+                                return directions[Math.round(degrees / 45) % 8]; 
+                            }
+                                
+                                </script> 
+                                </body> 
+                                </html>
+
+                  
+                  
